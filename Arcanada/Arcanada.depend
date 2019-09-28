@@ -1,0 +1,35 @@
+# depslib dependency file v1.0
+1569671386 source:/home/gefester/DEVELOP/Arcanada/main.cpp
+	<SFML/Graphics.hpp>
+	"player.h"
+	"block.h"
+
+1569670519 /home/gefester/DEVELOP/Arcanada/map.h
+	<SFML/Graphics.hpp>
+
+1569670119 /home/gefester/DEVELOP/Arcanada/player.h
+	<SFML/Graphics.hpp>
+	"ball.h"
+
+1569666293 /home/gefester/DEVELOP/Arcanada/block.h
+	<SFML/Graphics.hpp>
+
+1569670851 /home/gefester/DEVELOP/Arcanada/ball.h
+	<SFML/Graphics.hpp>
+	"map.h"
+
+1569474016 source:/home/gefester/DEVELOP/Arcanada BackUp/Arcanada/main.cpp
+	<SFML/Graphics.hpp>
+	"player.h"
+
+1569473358 /home/gefester/DEVELOP/Arcanada BackUp/Arcanada/player.h
+	<SFML/Graphics.hpp>
+	"ball.h"
+
+1569473430 /home/gefester/DEVELOP/Arcanada BackUp/Arcanada/ball.h
+	<SFML/Graphics.hpp>
+	"map.h"
+
+1569473583 /home/gefester/DEVELOP/Arcanada BackUp/Arcanada/map.h
+	<SFML/Graphics.hpp>
+
