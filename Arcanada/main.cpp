@@ -1,36 +1,156 @@
 #include <SFML/Graphics.hpp>
-#include "player.h"
-#include "block.h"
+#include <SFML/Audio.hpp>
+#include "start_menu.h"
+#include "ball.h"
+
 
 using namespace sf;
 
-const int windowWeight = 928, windowHeight = 544;   //высота и ширина окна
-const int playerH = 32, playerW = 128, playerFromDown = 10;  //высота и ширина спрайта игрока, расстояние спрайта от нижней части экрана
+const int windowWeight = 1408, windowHeight = 928;   //высота и ширина окна
+const int playerH = 32, playerW = 128, playerFromDown = 16;  //высота и ширина спрайта игрока, расстояние спрайта от нижней части экрана
 const int ballH = 32, ballW = 32; //высота и ширина спрайта мяча
-const int blockH = 32, blockW = 48;
+const int blockH = 32, blockW = 32;
 
-bool condition = false;
+RenderWindow window(VideoMode(windowWeight, windowHeight), "Arcanada, tak i nada");
 
-vector<Block> blocks;//вектор для хранения объектов блоков
+void start_menu(){
+    Font font;//шрифт
+    font.loadFromFile("pixel.ttf");
+    Text text("", font, 80);
+    text.setStyle(sf::Text::Bold);
+
+    Music music;
+    music.openFromFile("audio/riot.ogg");
+    music.setVolume(15);
+    music.play();
+
+    int n = 0;
+    while(window.isOpen()){
+        Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed || (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape) )
+				window.close();
+		}
+
+		switch(n%7){
+        case 0:
+            text.setColor(Color::Green);
+            break;
+        case 1:
+            text.setColor(Color::Red);
+            break;
+        case 2:
+            text.setColor(Color::Blue);
+            break;
+        case 3:
+            text.setColor(Color::Yellow);
+            break;
+        case 4:
+            text.setColor(Color::Magenta);
+            break;
+        case 5:
+            text.setColor(Color::White);
+            break;
+        case 6:
+            text.setColor(Color::Cyan);
+            break;
+		}
+		++n;
+
+		if(Keyboard::isKeyPressed(Keyboard::F))
+            break;
+
+		window.clear();
+
+		text.setString("PRESS 'F' TO START GAME");
+		text.setPosition(270, windowHeight/3+70);
+		window.draw(text);//рисую этот текст
+
+		window.display();
+    }
+}
+
+void game_over(){
+    Font font;//шрифт
+    font.loadFromFile("pixel.ttf");
+    Text text("", font, 80);
+    text.setColor(Color::White);
+    text.setStyle(sf::Text::Bold);
+
+    Music music;
+    music.openFromFile("audio/predead.ogg");
+    music.setVolume(15);
+    music.play();
+    Time t1 = milliseconds(3500);
+    sleep(t1);
+    music.openFromFile("audio/dead.ogg");
+    music.setVolume(15);
+    music.play();
+
+    while(window.isOpen()){
+        Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed || (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape) )
+				window.close();
+		}
+
+		window.clear();
+
+		text.setString("U r lOoOosEr\npress Esc to exit");
+		text.setPosition(400, windowHeight/3);
+		window.draw(text);//рисую этот текст
+
+		window.display();
+    }
+}
+
+std::vector<Block> blocks(99);
 
 int main()
 {
-	RenderWindow window(VideoMode(windowWeight, windowHeight), "ZHOPA");
+    window.setFramerateLimit(60);
+	start_menu();
 
-	window.setFramerateLimit(60);
+	Music music;
+    music.openFromFile("audio/sample.ogg");
+    music.setVolume(15);
+    music.play();
+    Time t1 = milliseconds(1000);
+    sleep(t1);
+    music.openFromFile("audio/tales.ogg");
+    music.setVolume(15);
+    music.play();
 
     ///////////////////////Объявление игровых объектов/////////////////////////////////////////////////////////////////////////
-	Player p("platform.png",(windowWeight-playerW)/2,windowHeight-playerH-playerFromDown,playerW, playerH);//создаем объект p класса player,задаем "hero.png" как имя файла+расширение, далее координата Х,У, ширина, высота.
-	Ball B("ball.png", (windowWeight-playerW)/2, (windowHeight-playerH)/2, ballW, ballH);   //создаем объект класса Ball
+	Player p("platform.png", windowWeight-playerW*4,windowHeight-playerH-playerFromDown,playerW, playerH);//создаем объект p класса player,задаем "hero.png" как имя файла+расширение, далее координата Х,У, ширина, высота.
+	Ball B("ball.png", (windowWeight-playerW), (windowHeight-playerH), ballW, ballH);   //создаем объект класса Ball
 
-	Block b1("block.png", 96, 96, blockW, blockH);
-	Block b2("block.png", 96+96, 96, blockW, blockH);
-	Block b3("block.png", 96+2*96, 96, blockW, blockH);
-	Block b4("block.png", 96+3*96, 96, blockW, blockH);
-	Block b5("block.png", 96+4*96, 96, blockW, blockH);
-	Block b6("block.png", 96+5*96, 96, blockW, blockH);
-	Block b7("block.png", 96+6*96, 96, blockW, blockH);
-	Block b8("block.png", 96+7*96, 96, blockW, blockH);
+	int n = 0;
+	for(int i = 0; i < WIDTH_MAP; ++i)
+    for(int j = 0; j < HEIGHT_MAP; ++j){
+            if(TileMap[j][i] == 's'){
+                blocks[n].x = 32*i;
+                blocks[n].y = 32*j;
+                ++n;
+            }
+    }
+    for(int i = 0; i < blocks.size(); ++i){
+        blocks[i].File = "block.png";
+        blocks[i].w = blockW;
+        blocks[i].h = blockH;
+        blocks[i].image.loadFromFile("images/" + blocks[i].File);
+        blocks[i].texture.loadFromImage(blocks[i].image);
+        blocks[i].sprite.setTexture(blocks[i].texture);
+        blocks[i].sprite.setPosition(blocks[i].x, blocks[i].y);
+    }
+
+    Font font;//шрифт
+    font.loadFromFile("pixel.ttf");
+    Text text("", font, 30);
+    text.setColor(Color::Green);
+    text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Image map_image;//объект изображения для карты
@@ -40,81 +160,49 @@ int main()
 	Sprite s_map;//создаём спрайт для карты
 	s_map.setTexture(map);//заливаем текстуру спрайтом
 
-    int pixelCushion = 5;
-
 	while (window.isOpen())
 	{
-        ///////////////////условия столкновений/////////////////////////////////
-        bool leftWall = B.x > 32 && B.x < 32+pixelCushion;
-        bool rightWall = B.x < windowWeight - 64 && B.x > windowWeight - 64-pixelCushion;
-        bool topWall = B.y > 32 && B.y < 32+pixelCushion;
-        bool platform = (B.y+ballH) > p.y && (B.y+ballH) < p.y + pixelCushion && B.x+ballW/2 > p.x && B.x+ballW/2 < p.x + playerW;
-        ////////////////////////////////////////////////////////////////////////
-
-		sf::Event event;
+        Event event;
 		while (window.pollEvent(event))
 		{
-			if (event.type == sf::Event::Closed)
+			if (event.type == Event::Closed || (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape) )
 				window.close();
 		}
 
 
 		///////////////////////////////////////////Управление персонажем с анимацией////////////////////////////////////////////////////////////////////////
 		if (Keyboard::isKeyPressed(Keyboard::Left)) {
-			p.dir = 0; p.speed = 15;
+			p.dir = 0;
 		}
+        else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+			p.dir = 1;
+		}
+		else
+        {
+            p.dir = 2;
+        }
 
-		if (Keyboard::isKeyPressed(Keyboard::Right)) {
-			p.dir = 1; p.speed = 15;
-		}
 
 		///////////////////////////////////////////Столкновения мяча/////////////////////////////////////////////////////////////
-		if(condition == false){ //Если мяч еще не отталкивался от стены после последнего приближения к ней
-            if(platform){
-                //Взаимодействие с игроком: если до верха платформы меньше одного пикселя
-                //и если координата х центра мяча в пределах х платформы
-                B.dy = -B.dy;   //разворачиваем скорость по y
-            }
+        B.interactionWithWall(32, windowWeight-64, 32);
+        B.interactionWithPlayer(p.getCoordinateX(), p.getCoordinateY(), playerW, playerH);
 
-            if(topWall)
-                B.dy = -B.dy;
-            if(leftWall)
-                B.dx = -B.dx;
-            if(rightWall)
-                B.dx = -B.dx;
+        for(int i = 0; i < blocks.size(); ++i){
+            if(blocks[i].File != "broken")
+                B.interactionWithBlock(blocks[i], p);
+        }
 
-            condition = true;
-		}
-		else if(!topWall && !leftWall && !rightWall && !platform);  //если мяч вышел из зоны отталкивания, мы разрешаем ему оттолкнуться в следующий раз
-            condition = false;
-
-        for(int i = 0; i < 8; ++i){
-            bool topBlock = (B.y+ballH) > 96 && (B.y+ballH) < 96 + pixelCushion && B.x+ballW/2 > 96+96*i && B.x+ballW/2 < 96+96*i + blockW;
-            bool leftBlock = 0;
-            bool rightBlock = 0;
-            bool bottomBlock = B.y > 96+blockH && B.y < 96+blockH + pixelCushion && B.x+ballW/2 > 96+96*i && B.x+ballW/2 < 96+96*i + blockW;
-            if(topBlock || bottomBlock)
-                B.dy = -B.dy;
-            if(leftBlock || rightBlock)
-                B.dx = -B.dx;
+        if(B.y > windowHeight){
+            music.stop();
+            game_over();
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        p.interactionWithWall(32, windowWeight-64);
 
         //обновляем координаты и спрайты объектов
 		p.update();
         B.update();
-
-        b1.update();
-        b2.update();
-        b3.update();
-        b4.update();
-        b5.update();
-        b6.update();
-        b7.update();
-        b8.update();
 		/////////////////////////////////////////////////////
-
 
 
 		window.clear();
@@ -130,17 +218,17 @@ int main()
 			window.draw(s_map);//рисуем тайлы
 		}
 
-		window.draw(b1.sprite);
-		window.draw(b2.sprite);
-		window.draw(b3.sprite);
-		window.draw(b4.sprite);
-		window.draw(b5.sprite);
-		window.draw(b6.sprite);
-		window.draw(b7.sprite);
-		window.draw(b8.sprite);
-
+		for(int i = 0; i < blocks.size(); ++i)
+            window.draw(blocks[i].sprite);
 
 		window.draw(p.sprite);//рисуем спрайт объекта p класса player
+
+		std::ostringstream playerScoreString;
+		playerScoreString << p.playerScore;
+		text.setString("Score:" + playerScoreString.str());
+		text.setPosition(50, windowHeight-50);
+		window.draw(text);//рисую этот текст
+
 		window.draw(B.sprite); //рисуем спрайт объекта B класса Ball
 		window.display();   //выводим всё нарисованное
 	}

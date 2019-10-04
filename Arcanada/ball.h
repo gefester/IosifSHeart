@@ -1,21 +1,24 @@
 #include <SFML/Graphics.hpp>
 #include "map.h"
-using namespace std;
+#include "block.h"
+#include <sstream>
+#include "player.h"
+#include <iostream>
 
 using namespace sf;
 
 ////////////////////////////////////////////////////КЛАСС МЯЧА////////////////////////
 class Ball { // класс мяча
 public:
-    float x, y;
-    float w, h, dx, dy, speed ;
+    int x, y;
+    int w, h, dx, dy, speed ;
     String File; //файл с расширением
     Image image;//сфмл изображение
     Texture texture;//сфмл текстура
     Sprite sprite;//сфмл спрайт
 
-    Ball(String F, float X, float Y, float W, float H){ //Конструктор класса
-        dx=-5;dy =-5;
+    Ball(String F, int X, int Y, int W, int H){ //Конструктор класса
+        dx=-8;dy =-8;
         File = F;//имя файла+расширение
         w = W; h = H;//высота и ширина
         image.loadFromFile("images/" + File);
@@ -27,26 +30,58 @@ public:
 
 
     void update(){ //функция "оживления" объекта класса. update - обновление.
-        interactionWithMap();//вызываем функцию, отвечающую за взаимодействие с картой
         x += dx;//смещение координат за кадр
         y += dy;
         sprite.setPosition(x,y);
         }
 
-    void interactionWithMap()//ф-ция взаимодействия с картой
+    void interactionWithBlock(Block& b, Player& p)//метод взаимодействия с блоками
+    //bX и bY - координаты блока, которые мы передаем в метод
 	{
-            //for (int i = y / 32; i < (y + h) / 32 + 1; i++)//координата y тайла, в котором находится мяч
-            //for (int j = x / 32; j<(x + w) / 32 + 1; j++)//координата x тайла, в котором находится мяч
-            //{
-               // if (TileMap[i][j] == '0')//Если "край карты"
-               // {
-                  //  if(i == 0 || i == 16)
-                  //      dy = -dy;
-                 //   else if(j == 0 || j == 28)
-               //         dx = -dx;
-               // }
-           // }
-
+	    if((y+h) == b.y && (x >= b.x && x <= b.x + b.w || x+w >= b.x && x+w <= b.x + b.w)){
+        //условия столкновения с верхней поверхностью блока. Столкновение регистрируется от любого пикселя нижней поверхности мяча
+        //аналогично другие условия
+            dy = -8;
+            b.File = "broken";
+            b.sprite.setPosition(-64, -64);
+            ++p.playerScore;
+            std::cout << "Up" << std::endl;
+        }
+        if(y == b.y+b.h && (x >= b.x && x <= b.x + b.w || x+w >= b.x && x+w <= b.x + b.w)){  //Нижняя поверхность
+            dy = 8;
+            b.File = "broken";
+            b.sprite.setPosition(-64, -64);
+            ++p.playerScore;
+            std::cout << "Down" << std::endl;
+        }
+        if(x + w == b.x && (y >= b.y && y <= b.y + b.h || y + h >= b.y && y + h <= b.y + b.h)){ //Левая поверхность
+            dx = -8;
+            b.File = "broken";
+            b.sprite.setPosition(-64, -64);
+            ++p.playerScore;
+            std::cout << "Left" << std::endl;
+        }
+        if(x == b.x + b.w && (y >= b.y && y <= b.y + b.h || y + h >= b.y && y + h <= b.y + b.h)){ //Правая поверхность
+            dx = 8;
+            b.File = "broken";
+            b.sprite.setPosition(-64, -64);
+            ++p.playerScore;
+            std::cout << "Right" << std::endl;
+        }
 	}
 
+
+	void interactionWithWall(int leftWall, int rightWall, int topWall){
+        if(y == topWall)
+            dy = -dy;
+        if(x == leftWall || x == rightWall){
+            dx = -dx;
+            std::cout << "Wall" << std::endl;
+        }
+	}
+
+	void interactionWithPlayer(int playerX, int playerY, int playerW, int playerH){
+        if( (y+h) == playerY && (x >= playerX && x <= playerX+playerW || x+w >= playerX && x+w <= playerX+playerW) )
+            dy = -dy;
+	}
 };

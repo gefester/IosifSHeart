@@ -1,21 +1,21 @@
 #include <SFML/Graphics.hpp>
-#include "ball.h"
+
 
 using namespace sf;
 
 ////////////////////////////////////////////////////Класс игрока////////////////////////
 class Player { // класс Игрока
+private: int x, y; //координаты игрока
 public:
-    float x, y; //координаты игрока
-    float w, h, dx, speed ;
-    int dir ; //направление (direction) движения игрока
+    int w, h, dx, speed ;
+    int dir, playerScore; //направление (direction) движения игрока
     String File; //файл с расширением
     Image image;//сфмл изображение
     Texture texture;//сфмл текстура
     Sprite sprite;//сфмл спрайт
 
-    Player(String F, float X, float Y, float W, float H){ //Конструктор с параметрами для класса Player. При создании объекта класса мы будем задавать имя файла, координату Х и У, ширину и высоту
-        dx=0;speed=0;dir=0;
+    Player(String F, int X, int Y, int W, int H){ //Конструктор с параметрами для класса Player. При создании объекта класса мы будем задавать имя файла, координату Х и У, ширину и высоту
+        dx=0;dir=0;playerScore = 0;
         File = F;//имя файла+расширение
         w = W; h = H;//высота и ширина
         image.loadFromFile("images/" + File);//запихиваем в image наше изображение вместо File мы передадим то, что пропишем при создании объекта. В нашем случае "hero.png" и получится запись идентичная image.loadFromFile("images/hero/png");
@@ -29,25 +29,25 @@ public:
         {
         switch (dir)//реализуем поведение в зависимости от направления. (каждая цифра соответствует направлению)
         {
-        case 0: dx = -speed; break;//по иксу задаем положительную скорость, по игреку зануляем. получаем, что персонаж идет только вправо
-        case 1: dx = speed; break;//по иксу задаем отрицательную скорость, по игреку зануляем. получается, что персонаж идет только влево
+        case 0: dx = -16; break;//по иксу задаем положительную скорость, по игреку зануляем. получаем, что персонаж идет только вправо
+        case 1: dx = 16; break;//по иксу задаем отрицательную скорость, по игреку зануляем. получается, что персонаж идет только влево
+        case 2: dx = 0; break;
         }
-        interactionWithMap();//вызываем функцию, отвечающую за взаимодействие с картой
         x += dx;//то движение из прошлого урока. наше ускорение на время получаем смещение координат и как следствие движение
-        speed = 0;//зануляем скорость, чтобы персонаж остановился.
         sprite.setPosition(x,y);
         }
 
-    void interactionWithMap()
-    {
-        //for (int i = y / 32; i < (y + h) / 32 + 1; i++)//координата y тайла, в котором находится мяч
-           // for (int j = x / 32; j<(x + w) / 32 + 1; j++)//координата x тайла, в котором находится мяч
-            //{
-               // if (TileMap[i][j] == '0')//Если "край карты"
-               // {
+    void interactionWithWall(int leftWall, int rightWall){
+        if(x > leftWall && x < leftWall+8)
+            x = leftWall+4;
+        if(x < rightWall && x > rightWall-8)
+            x = rightWall-w-4;
+	}
 
-               // }
-            //}
+    int getCoordinateX(){
+        return x;
     }
-
+    int getCoordinateY(){
+        return y;
+    }
 };
