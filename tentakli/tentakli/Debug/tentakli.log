@@ -1,0 +1,4 @@
+﻿  tentakli.cpp
+C:\Users\LAPTEVA\Documents\Саша\tentakli\tentakli\tentakli.cpp(1,10): warning C4067:  непредвиденные лексемы за директивой препроцессора, требуется newline
+C:\Users\LAPTEVA\Documents\Саша\tentakli\tentakli\tentakli.cpp(2,10): warning C4067:  непредвиденные лексемы за директивой препроцессора, требуется newline
+  tentakli.vcxproj -> C:\Users\LAPTEVA\Documents\Саша\tentakli\Debug\tentakli.exe
