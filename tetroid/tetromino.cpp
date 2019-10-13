@@ -13,7 +13,7 @@ Tetromino::tetroCollider Tetromino::calculateCollider(uint_fast8_t* grid)
         {
             if((row & 3) == 0) continue;
             if(x < rowLeft) rowLeft = x;
-            else rowRight = x;
+            rowRight = x;
         }
         if (rowLeft < left) left = rowLeft;
         if (rowRight > right) right = rowRight;
